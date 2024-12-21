@@ -10,7 +10,12 @@ fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "xmas") {
-        composable("xmas") { Greeting(name = "Marta")  }
+        composable("xmas") {
+            Greeting(name = "Marta", onButtonClick =
+            { navController.navigate("family-pic") })
+        }
+        composable("family-pic"){ FamilyImage(onButtonClick = {navController.navigate("family-riddle")})}
+        composable("family-riddle"){ FamilyImageRiddle() }
 //        composable("images") { Finale() }
     }
 }
