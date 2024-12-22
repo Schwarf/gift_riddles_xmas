@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">XmasGiftRiddles</string>
+    <string name="snowman_message">Hallo %1$s, \nich bin der Weihnachts-Schneemann. Auf diesem weissen Bild kannst Du mich nicht sehen. \nAber schau mal genau hin, dann findest Du vielleicht meine Nase. Drück sie.</string>
+    <string name="family_task">Schau Dir das Bild genau an und merke Dir wer wo ist. Wenn Du weiter machen willst drück den Knopf! </string>>
+    <string name="family_q_1">Wo ist Onkel Knödel auf dem Bild? Links, rechts oder in der Mitte? </string>>
+    <string name="family_q_2">Wo sind Mama und Papa? Links, rechts oder in der Mitte? </string>>
+    <string name="family_q_3">Wer ist die jüngste Person auf dem Bild? </string>>
+
 </resources>

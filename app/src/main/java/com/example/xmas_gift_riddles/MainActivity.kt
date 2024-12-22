@@ -4,19 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,11 +36,12 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import com.example.xmas_gift_riddles.ui.theme.XmasGiftRiddlesTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,14 +57,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, onButtonClick: () -> Unit) {
+    val context = LocalContext.current
     Box(modifier = Modifier.fillMaxSize()) {
         // Main text area
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.weight(1f)) // Adds flexible space
             GlowingText(
-                text = "Hallo $name, \n" +
-                        "ich bin der Weihnachts-Schneemann. Auf diesem weissen Bild kannst Du mich nicht sehen. \n" +
-                        "Aber schau mal genau hin, dann findest Du vielleicht meine Nase. Drück sie.",
+                text = context.getString(R.string.snowman_message, name),
                 glowColor = Color.Red,
                 textColor = Color.Red,
                 alpha = 0.8f
@@ -107,6 +116,7 @@ fun Greeting(name: String, onButtonClick: () -> Unit) {
 
 @Composable
 fun FamilyImage(onButtonClick: () -> Unit) {
+    val context = LocalContext.current
     Box(modifier = Modifier.fillMaxSize()) {
         // Background image setup
         Image(
@@ -118,7 +128,7 @@ fun FamilyImage(onButtonClick: () -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.weight(1f)) // This adds flexible space between text and input
             GlowingText(
-                text = "Schau Dir das Bild genau an und merke Dir wer wo ist. Wenn Du weiter machen willst drueck den Knopf!",
+                text = context.getString(R.string.family_task),
                 glowColor = Color.Red,
                 textColor = Color.Red,
                 alpha = 0.8f
@@ -132,10 +142,98 @@ fun FamilyImage(onButtonClick: () -> Unit) {
 }
 
 @Composable
-fun FamilyImageRiddle()
-{
+fun FamilyImageRiddle() {
+    val context = LocalContext.current
+    val questions = listOf(
+        context.getString(R.string.family_q_1) to "links",
+        context.getString(R.string.family_q_2) to "mitte",
+        context.getString(R.string.family_q_3) to "marta"
+    )
+    var currentQuestionIndex by remember { mutableStateOf(0) }
+    var userAnswer by remember { mutableStateOf("") }
+    var isCorrect by remember { mutableStateOf(false) }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Display the generated Christmas image
+        Image(
+            painter = painterResource(R.drawable.cartoon_family), // Replace with your drawable
+            contentDescription = "Christmas Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Display the current question
+        Text(
+            text = questions[currentQuestionIndex].first,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(8.dp)
+        )
+
+        // Input box for the user answer
+        TextField(
+            value = userAnswer,
+            onValueChange = { userAnswer = it },
+            label = { Text("Deine Antwort") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Submit button
+        Button(
+            onClick = {
+                if (userAnswer.trim().equals(questions[currentQuestionIndex].second, ignoreCase = true)) {
+                    isCorrect = true
+                    if (currentQuestionIndex < questions.size - 1) {
+                        currentQuestionIndex++
+                        userAnswer = ""
+                        isCorrect = false
+                    } else {
+                        // All questions answered
+                        isCorrect = true
+                    }
+                }
+            },
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text("Submit")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Feedback message
+        if (isCorrect && currentQuestionIndex == questions.size - 1) {
+            Text(
+                text = "Super! Du hast alle Fragen richtig beantwortet.",
+                color = Color.Green,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else if (isCorrect) {
+            Text(
+                text = "Richtig! Naechste Frage:",
+                color = Color.Green,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else if (userAnswer.isNotBlank()) {
+            Text(
+                text = "Incorrect! Try again.",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
 }
+
 
 @Composable
 fun GlowingText(text: String, glowColor: Color, textColor: Color, alpha: Float) {
