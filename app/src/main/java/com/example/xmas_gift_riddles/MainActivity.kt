@@ -47,7 +47,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.getString
 import com.example.xmas_gift_riddles.ui.theme.XmasGiftRiddlesTheme
 
 class MainActivity : ComponentActivity() {
@@ -170,85 +169,90 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
     var userAnswer by remember { mutableStateOf("") }
     var isCorrect by remember { mutableStateOf(false) }
 
-    Column(
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        // Display the generated Christmas image
+        // Background image
         Image(
             painter = painterResource(R.drawable.cartoon_family), // Replace with your drawable
-            contentDescription = "Christmas Image",
+            contentDescription = "Cartoon Family Image",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            contentScale = ContentScale.Fit
+                .fillMaxSize() // Make the image fill the whole screen
+                .align(Alignment.Center),
+            contentScale = ContentScale.Crop // To fill the screen without distortion
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Display the current question
-        Text(
-            text = questions[currentQuestionIndex].first,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(8.dp)
-        )
-
-        // Input box for the user answer
-        TextField(
-            value = userAnswer,
-            onValueChange = { userAnswer = it },
-            label = { Text("Deine Antwort") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Submit button
-        Button(
-            onClick = {
-                if (userAnswer.trim().equals(questions[currentQuestionIndex].second, ignoreCase = true)) {
-                    isCorrect = true
-                    if (currentQuestionIndex < questions.size - 1) {
-                        currentQuestionIndex++
-                        userAnswer = ""
-                        isCorrect = false
-                    } else {
-                        // All questions answered
-                        isCorrect = true
-                    }
-                }
-            },
-            modifier = Modifier.align(Alignment.End)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Abschicken")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Feedback message
-        if (isCorrect && currentQuestionIndex == questions.size - 1) {
-            GlowingText(
-                text = context.getString(R.string.family_solved),
-                glowColor = Color.Red,
-                textColor = Color.Green,
-                alpha = 0.8f
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onButtonClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Weiter zur nächsten Frage.")
-            }
-        } else if (isCorrect) {
+            // Display the current question
             Text(
-                text = "Richtig! Nächste Frage:",
-                color = Color.Green,
-                style = MaterialTheme.typography.bodyMedium
+                text = questions[currentQuestionIndex].first,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(8.dp)
             )
+
+            // Input box for the user answer
+            TextField(
+                value = userAnswer,
+                onValueChange = { userAnswer = it },
+                label = { Text("Deine Antwort") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Submit button
+            Button(
+                onClick = {
+                    if (userAnswer.trim()
+                            .equals(questions[currentQuestionIndex].second, ignoreCase = true)
+                    ) {
+                        isCorrect = true
+                        if (currentQuestionIndex < questions.size - 1) {
+                            currentQuestionIndex++
+                            userAnswer = ""
+                            isCorrect = false
+                        } else {
+                            // All questions answered
+                            isCorrect = true
+                        }
+                    }
+                },
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Abschicken")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Feedback message
+            if (isCorrect && currentQuestionIndex == questions.size - 1) {
+                GlowingText(
+                    text = context.getString(R.string.family_solved),
+                    glowColor = Color.Red,
+                    textColor = Color.Green,
+                    alpha = 0.8f
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onButtonClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Weiter zur nächsten Frage.")
+                }
+            } else if (isCorrect) {
+                Text(
+                    text = "Richtig! Nächste Frage:",
+                    color = Color.Green,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
