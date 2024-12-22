@@ -15,7 +15,8 @@ fun AppNavigation() {
             { navController.navigate("family-pic") })
         }
         composable("family-pic"){ FamilyImage(onButtonClick = {navController.navigate("family-riddle")})}
-        composable("family-riddle"){ FamilyImageRiddle() }
+        composable("family-riddle"){ FamilyImageRiddle(onButtonClick = {navController.navigate("square-riddle")}) }
+        composable("square-riddle"){ FamilyImageRiddle() }
 //        composable("images") { Finale() }
     }
 }

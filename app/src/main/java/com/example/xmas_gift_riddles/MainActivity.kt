@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -123,9 +124,10 @@ fun FamilyImage(onButtonClick: () -> Unit) {
             painter = painterResource(R.drawable.family),
             contentDescription = null, // Background image does not require a description
             contentScale = ContentScale.Fit,
-            modifier = Modifier.matchParentSize()
+            modifier = Modifier.matchParentSize().align(Alignment.TopCenter)
+
         )
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp).fillMaxHeight(0.2f)) {
             Spacer(modifier = Modifier.weight(1f)) // This adds flexible space between text and input
             GlowingText(
                 text = context.getString(R.string.family_task),
@@ -134,15 +136,25 @@ fun FamilyImage(onButtonClick: () -> Unit) {
                 alpha = 0.8f
             )
         }
+        // Button positioned at the bottom of the screen
         Button(
-            onClick = { onButtonClick()},
-        ){ Text(text = "Hab es mir gemerkt. Weiter!") }
-
+            onClick = { onButtonClick() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp) // Optional: Add padding around the button
+        ) {
+            GlowingText(
+                text = "Hab es mir gemerkt. Weiter!",
+                glowColor = Color.Red,
+                textColor = Color.White,
+                alpha = 0.8f
+            )
+        }
     }
 }
 
 @Composable
-fun FamilyImageRiddle() {
+fun FamilyImageRiddle(onButtonClick: () -> Unit) {
     val context = LocalContext.current
     val questions = listOf(
         context.getString(R.string.family_q_1) to "links",
@@ -167,7 +179,7 @@ fun FamilyImageRiddle() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Fit
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -206,34 +218,41 @@ fun FamilyImageRiddle() {
             },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Submit")
+            Text("Abschicken")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Feedback message
         if (isCorrect && currentQuestionIndex == questions.size - 1) {
-            Text(
-                text = "Super! Du hast alle Fragen richtig beantwortet.",
-                color = Color.Green,
-                style = MaterialTheme.typography.bodyMedium
+            GlowingText(
+                text = context.getString(R.string.family_solved),
+                glowColor = Color.Red,
+                textColor = Color.Green,
+                alpha = 0.8f
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onButtonClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Weiter zur nächsten Frage.")
+            }
         } else if (isCorrect) {
             Text(
-                text = "Richtig! Naechste Frage:",
+                text = "Richtig! Nächste Frage:",
                 color = Color.Green,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        } else if (userAnswer.isNotBlank()) {
-            Text(
-                text = "Incorrect! Try again.",
-                color = Color.Red,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
 
+
+@Composable
+fun TriangleRiddle() {
+    val context = LocalContext.current
+}
 
 @Composable
 fun GlowingText(text: String, glowColor: Color, textColor: Color, alpha: Float) {
