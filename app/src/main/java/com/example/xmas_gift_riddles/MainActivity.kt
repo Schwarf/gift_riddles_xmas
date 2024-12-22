@@ -15,7 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -40,6 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getString
@@ -250,8 +255,50 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
 
 
 @Composable
-fun TriangleRiddle() {
-    val context = LocalContext.current
+fun SquareRiddle(onPasswordCorrect: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false)  }
+    var password by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Display the generated Christmas image
+        Image(
+            painter = painterResource(R.drawable.squares), // Replace with your drawable
+            contentDescription = "squares",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            contentScale = ContentScale.Fit
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Display the current question
+        Text(
+            text = "Wie viele Quadrate findest Du in diesem Bild?",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(8.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        DigitOnlyTextField(value = password, onValueChange = { password = it })
+        Button(onClick = {
+            if (password == "27071948") {
+                onPasswordCorrect()
+            } else {
+                showDialog = true
+            }
+        }) {
+            Text("Zahlencode abschicken!")
+        }
+
+    }
+    if (showDialog)
+        ShowIncorrectPasswordDialog (onDismiss = {showDialog = false})
+
 }
 
 @Composable
@@ -277,5 +324,45 @@ fun GlowingText(text: String, glowColor: Color, textColor: Color, alpha: Float) 
                     this@drawWithContent.drawContent()
                 }
             }
+    )
+}
+
+@Composable
+fun DigitOnlyTextField(value: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = value,
+        onValueChange = {
+            // Check if the new value consists only of digits before updating
+            if (it.all { char -> char.isDigit() }) {
+                onValueChange(it)
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        label = { Text("Geheimer Zahlencode") }
+        // Add other parameters like Modifier as needed
+    )
+}
+
+@Composable
+fun ShowIncorrectPasswordDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = {},
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Das war leider falsch.")
+
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onDismiss() }
+            ) {
+                Text(text = "Nochmal probieren.")
+            }
+        }
     )
 }
