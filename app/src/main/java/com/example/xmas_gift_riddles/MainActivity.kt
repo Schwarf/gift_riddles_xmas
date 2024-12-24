@@ -69,7 +69,7 @@ fun Greeting(name: String, onButtonClick: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f)) // Adds flexible space
             GlowingText(
                 text = context.getString(R.string.snowman_message, name),
-                glowColor = Color.Red,
+                glowColor = Color.Green,
                 textColor = Color.Red,
                 alpha = 0.8f
             )
@@ -135,7 +135,7 @@ fun FamilyImage(onButtonClick: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f)) // This adds flexible space between text and input
             GlowingText(
                 text = context.getString(R.string.family_task),
-                glowColor = Color.Red,
+                glowColor = Color.Green,
                 textColor = Color.Red,
                 alpha = 0.8f
             )
@@ -149,8 +149,8 @@ fun FamilyImage(onButtonClick: () -> Unit) {
         ) {
             GlowingText(
                 text = "Hab es mir gemerkt. Weiter!",
-                glowColor = Color.Red,
-                textColor = Color.White,
+                glowColor = Color.Green,
+                textColor = Color.Red,
                 alpha = 0.8f
             )
         }
@@ -161,28 +161,20 @@ fun FamilyImage(onButtonClick: () -> Unit) {
 fun FamilyImageRiddle(onButtonClick: () -> Unit) {
     val context = LocalContext.current
     val questions = listOf(
-        context.getString(R.string.family_q_1) to "links",
+        context.getString(R.string.family_q_1) to "rechts",
         context.getString(R.string.family_q_2) to "mitte",
         context.getString(R.string.family_q_3) to "marta"
     )
     var currentQuestionIndex by remember { mutableStateOf(0) }
     var userAnswer by remember { mutableStateOf("") }
     var isCorrect by remember { mutableStateOf(false) }
-
+    var showDialog by remember { mutableStateOf(false)  }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         // Background image
-        Image(
-            painter = painterResource(R.drawable.cartoon_family), // Replace with your drawable
-            contentDescription = "Cartoon Family Image",
-            modifier = Modifier
-                .fillMaxSize() // Make the image fill the whole screen
-                .align(Alignment.Center),
-            contentScale = ContentScale.Crop // To fill the screen without distortion
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -223,6 +215,10 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
                             isCorrect = true
                         }
                     }
+                    else {
+                        // Show dialog if the answer is incorrect
+                        showDialog = true
+                    }
                 },
                 modifier = Modifier.align(Alignment.End)
             ) {
@@ -255,6 +251,8 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
             }
         }
     }
+    if (showDialog)
+        ShowIncorrectPasswordDialog (onDismiss = {showDialog = false})
 }
 
 
@@ -290,7 +288,7 @@ fun SquareRiddle(onPasswordCorrect: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         DigitOnlyTextField(value = password, onValueChange = { password = it })
         Button(onClick = {
-            if (password == "27071948") {
+            if (password == "5") {
                 onPasswordCorrect()
             } else {
                 showDialog = true
@@ -357,6 +355,12 @@ fun ShowIncorrectPasswordDialog(onDismiss: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.cartoon_family),
+                    contentDescription = "Error",
+                    modifier = Modifier.fillMaxWidth().height(200.dp).clip(shape = RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
                 Text(text = "Das war leider falsch.")
 
             }
