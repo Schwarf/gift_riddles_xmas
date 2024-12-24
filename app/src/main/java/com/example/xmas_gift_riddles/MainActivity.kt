@@ -318,7 +318,7 @@ fun SquareRiddle(onPasswordCorrect: () -> Unit) {
                     showDialog = true
                 }
             }) {
-                Text("Zahlencode abschicken!")
+                Text("Anzahl abschicken!")
             }
         }
     }
@@ -365,7 +365,7 @@ fun DigitOnlyTextField(value: String, onValueChange: (String) -> Unit) {
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        label = { Text("Geheimer Zahlencode") }
+        label = { Text("Anzahl") }
         // Add other parameters like Modifier as needed
     )
 }
@@ -492,6 +492,77 @@ fun NameRiddle(onButtonClick: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
+            }
+        }
+    }
+
+    if (showDialog) {
+        ShowIncorrectPasswordDialog(onDismiss = { showDialog = false })
+    }
+}
+
+@Composable
+fun TriangleRiddle(onPasswordCorrect: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+    var isPasswordCorrect by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (isPasswordCorrect) {
+            // Display only the GlowingText and "Weiter gehts" button
+            GlowingText(
+                text = context.getString(R.string.triangle_solved),
+                glowColor = Color.Green,
+                textColor = Color.Red,
+                alpha = 0.8f
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onPasswordCorrect,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Weiter gehts")
+            }
+        } else {
+            // Display the question and input components
+            Image(
+                painter = painterResource(R.drawable.triangles), // Replace with your drawable
+                contentDescription = "traingles",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Wie viele Dreiecke findest Du in diesem Bild?",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DigitOnlyTextField(value = password, onValueChange = { password = it })
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = {
+                if (password == "6") {
+                    isPasswordCorrect = true
+                } else {
+                    showDialog = true
+                }
+            }) {
+                Text("Anzahl abschicken!")
             }
         }
     }
