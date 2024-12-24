@@ -260,6 +260,8 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
 fun SquareRiddle(onPasswordCorrect: () -> Unit) {
     var showDialog by remember { mutableStateOf(false)  }
     var password by remember { mutableStateOf("") }
+    var isPasswordCorrect by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -289,7 +291,9 @@ fun SquareRiddle(onPasswordCorrect: () -> Unit) {
         DigitOnlyTextField(value = password, onValueChange = { password = it })
         Button(onClick = {
             if (password == "5") {
+                isPasswordCorrect = true
                 onPasswordCorrect()
+
             } else {
                 showDialog = true
             }
@@ -297,6 +301,16 @@ fun SquareRiddle(onPasswordCorrect: () -> Unit) {
             Text("Zahlencode abschicken!")
         }
 
+    }
+    // Display GlowingText when the password is correct
+    if (isPasswordCorrect) {
+
+        GlowingText(
+            text = context.getString(R.string.family_solved),
+            glowColor = Color.Green,
+            textColor = Color.Red,
+            alpha = 0.8f
+        )
     }
     if (showDialog)
         ShowIncorrectPasswordDialog (onDismiss = {showDialog = false})
