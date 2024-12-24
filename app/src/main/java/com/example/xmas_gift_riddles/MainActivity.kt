@@ -417,11 +417,8 @@ fun NameRiddle(onButtonClick: () -> Unit) {
 
     // Helper function to check permutations with whitespace
     fun isAnswerCorrect(answer: String, correctAnswer: String): Boolean {
-        // Remove all whitespace from the answer and correct answer
         val sanitizedAnswer = answer.replace("\\s".toRegex(), "")
-        // Generate all permutations of the correct answer
         val permutations = correctAnswer.toCharArray().toList().permutations().map { it.joinToString("") }
-        // Check if the sanitized answer matches any permutation
         return permutations.any { it.equals(sanitizedAnswer, ignoreCase = true) }
     }
 
@@ -472,7 +469,14 @@ fun NameRiddle(onButtonClick: () -> Unit) {
                 // Submit button
                 Button(
                     onClick = {
-                        if (isAnswerCorrect(userAnswer.trim(), questions[currentQuestionIndex].second)) {
+                        val correctAnswer = questions[currentQuestionIndex].second
+                        val isAnswerValid = if (currentQuestionIndex == 0) {
+                            isAnswerCorrect(userAnswer.trim(), correctAnswer) // Use isAnswerCorrect for the first question
+                        } else {
+                            userAnswer.trim().equals(correctAnswer, ignoreCase = true) // Simple equality for others
+                        }
+
+                        if (isAnswerValid) {
                             if (currentQuestionIndex < questions.size - 1) {
                                 currentQuestionIndex++
                                 userAnswer = ""
@@ -508,6 +512,7 @@ fun NameRiddle(onButtonClick: () -> Unit) {
         ShowIncorrectPasswordDialog(onDismiss = { showDialog = false })
     }
 }
+
 
 // Extension function to generate permutations
 fun <T> List<T>.permutations(): List<List<T>> {
