@@ -415,6 +415,16 @@ fun NameRiddle(onButtonClick: () -> Unit) {
     var isCorrect by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+    // Helper function to check permutations with whitespace
+    fun isAnswerCorrect(answer: String, correctAnswer: String): Boolean {
+        // Remove all whitespace from the answer and correct answer
+        val sanitizedAnswer = answer.replace("\\s".toRegex(), "")
+        // Generate all permutations of the correct answer
+        val permutations = correctAnswer.toCharArray().toList().permutations().map { it.joinToString("") }
+        // Check if the sanitized answer matches any permutation
+        return permutations.any { it.equals(sanitizedAnswer, ignoreCase = true) }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -462,9 +472,7 @@ fun NameRiddle(onButtonClick: () -> Unit) {
                 // Submit button
                 Button(
                     onClick = {
-                        if (userAnswer.trim()
-                                .equals(questions[currentQuestionIndex].second, ignoreCase = true)
-                        ) {
+                        if (isAnswerCorrect(userAnswer.trim(), questions[currentQuestionIndex].second)) {
                             if (currentQuestionIndex < questions.size - 1) {
                                 currentQuestionIndex++
                                 userAnswer = ""
@@ -501,6 +509,19 @@ fun NameRiddle(onButtonClick: () -> Unit) {
     }
 }
 
+// Extension function to generate permutations
+fun <T> List<T>.permutations(): List<List<T>> {
+    if (size == 1) return listOf(this)
+    val perms = mutableListOf<List<T>>()
+    val sub = this[0]
+    for (perm in (this - sub).permutations()) {
+        for (i in 0..perm.size) {
+            perms.add(perm.toMutableList().apply { add(i, sub) })
+        }
+    }
+    return perms
+}
+
 @Composable
 fun TriangleRiddle(onPasswordCorrect: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
@@ -523,13 +544,6 @@ fun TriangleRiddle(onPasswordCorrect: () -> Unit) {
                 textColor = Color.Red,
                 alpha = 0.8f
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onPasswordCorrect,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Weiter gehts")
-            }
         } else {
             // Display the question and input components
             Image(

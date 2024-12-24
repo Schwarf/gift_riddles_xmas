@@ -17,7 +17,8 @@ fun AppNavigation() {
         composable("family-pic"){ FamilyImage(onButtonClick = {navController.navigate("family-riddle")})}
         composable("family-riddle"){ FamilyImageRiddle(onButtonClick = {navController.navigate("square-riddle")}) }
         composable("square-riddle"){ SquareRiddle(onPasswordCorrect = {navController.navigate("name-riddle")}) }
-        composable("name-riddle"){ NameRiddle({}) }
+        composable("name-riddle"){ NameRiddle(onButtonClick = {navController.navigate("triangle-riddle")}) }
+        composable("triangle-riddle"){ TriangleRiddle{} }
 //        composable("images") { Finale() }
     }
 }
