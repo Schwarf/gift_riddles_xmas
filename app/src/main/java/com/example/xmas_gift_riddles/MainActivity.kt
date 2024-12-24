@@ -259,10 +259,11 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
 
 @Composable
 fun SquareRiddle(onPasswordCorrect: () -> Unit) {
-    var showDialog by remember { mutableStateOf(false)  }
+    var showDialog by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
     var isPasswordCorrect by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -270,52 +271,61 @@ fun SquareRiddle(onPasswordCorrect: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Display the generated Christmas image
-        Image(
-            painter = painterResource(R.drawable.squares), // Replace with your drawable
-            contentDescription = "squares",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            contentScale = ContentScale.Fit
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Display the current question
-        Text(
-            text = "Wie viele Quadrate findest Du in diesem Bild?",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(8.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        DigitOnlyTextField(value = password, onValueChange = { password = it })
-        Button(onClick = {
-            if (password == "5") {
-                isPasswordCorrect = true
-                onPasswordCorrect()
-
-            } else {
-                showDialog = true
+        if (isPasswordCorrect) {
+            // Display only the GlowingText and "Weiter gehts" button
+            GlowingText(
+                text = context.getString(R.string.square_solved),
+                glowColor = Color.Green,
+                textColor = Color.Red,
+                alpha = 0.8f
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onPasswordCorrect,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Weiter gehts")
             }
-        }) {
-            Text("Zahlencode abschicken!")
+        } else {
+            // Display the question and input components
+            Image(
+                painter = painterResource(R.drawable.squares), // Replace with your drawable
+                contentDescription = "squares",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Wie viele Quadrate findest Du in diesem Bild?",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DigitOnlyTextField(value = password, onValueChange = { password = it })
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = {
+                if (password == "5") {
+                    isPasswordCorrect = true
+                } else {
+                    showDialog = true
+                }
+            }) {
+                Text("Zahlencode abschicken!")
+            }
         }
-
     }
-    // Display GlowingText when the password is correct
-    if (isPasswordCorrect) {
 
-        GlowingText(
-            text = context.getString(R.string.family_solved),
-            glowColor = Color.Green,
-            textColor = Color.Red,
-            alpha = 0.8f
-        )
+    if (showDialog) {
+        ShowIncorrectPasswordDialog(onDismiss = { showDialog = false })
     }
-    if (showDialog)
-        ShowIncorrectPasswordDialog (onDismiss = {showDialog = false})
-
 }
 
 @Composable
@@ -388,4 +398,105 @@ fun ShowIncorrectPasswordDialog(onDismiss: () -> Unit) {
             }
         }
     )
+}
+
+
+
+@Composable
+fun NameRiddle(onButtonClick: () -> Unit) {
+    val context = LocalContext.current
+    val questions = listOf(
+        context.getString(R.string.names_q_1) to "wrb",
+        context.getString(R.string.names_q_2) to "anneliese",
+        context.getString(R.string.names_q_3) to "karl"
+    )
+    var currentQuestionIndex by remember { mutableStateOf(0) }
+    var userAnswer by remember { mutableStateOf("") }
+    var isCorrect by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isCorrect && currentQuestionIndex == questions.size - 1) {
+                // All questions answered correctly
+                GlowingText(
+                    text = context.getString(R.string.names_solved),
+                    glowColor = Color.Red,
+                    textColor = Color.Green,
+                    alpha = 0.8f
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onButtonClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Weiter zur nächsten Frage.")
+                }
+            } else {
+                // Show current question and answer input
+                Text(
+                    text = questions[currentQuestionIndex].first,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                // Input box for the user answer
+                TextField(
+                    value = userAnswer,
+                    onValueChange = { userAnswer = it },
+                    label = { Text("Deine Antwort") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Submit button
+                Button(
+                    onClick = {
+                        if (userAnswer.trim()
+                                .equals(questions[currentQuestionIndex].second, ignoreCase = true)
+                        ) {
+                            if (currentQuestionIndex < questions.size - 1) {
+                                currentQuestionIndex++
+                                userAnswer = ""
+                            } else {
+                                // All questions answered
+                                isCorrect = true
+                            }
+                        } else {
+                            // Show dialog if the answer is incorrect
+                            showDialog = true
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Abschicken")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Feedback message for intermediate correct answers
+                if (isCorrect) {
+                    Text(
+                        text = "Richtig! Nächste Frage:",
+                        color = Color.Green,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+
+    if (showDialog) {
+        ShowIncorrectPasswordDialog(onDismiss = { showDialog = false })
+    }
 }
