@@ -168,13 +168,12 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
     var currentQuestionIndex by remember { mutableStateOf(0) }
     var userAnswer by remember { mutableStateOf("") }
     var isCorrect by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false)  }
+    var showDialog by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Background image
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -182,53 +181,8 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Display the current question
-            Text(
-                text = questions[currentQuestionIndex].first,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(8.dp)
-            )
-
-            // Input box for the user answer
-            TextField(
-                value = userAnswer,
-                onValueChange = { userAnswer = it },
-                label = { Text("Deine Antwort") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Submit button
-            Button(
-                onClick = {
-                    if (userAnswer.trim()
-                            .equals(questions[currentQuestionIndex].second, ignoreCase = true)
-                    ) {
-                        isCorrect = true
-                        if (currentQuestionIndex < questions.size - 1) {
-                            currentQuestionIndex++
-                            userAnswer = ""
-                            isCorrect = false
-                        } else {
-                            // All questions answered
-                            isCorrect = true
-                        }
-                    }
-                    else {
-                        // Show dialog if the answer is incorrect
-                        showDialog = true
-                    }
-                },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Abschicken")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Feedback message
             if (isCorrect && currentQuestionIndex == questions.size - 1) {
+                // All questions answered correctly
                 GlowingText(
                     text = context.getString(R.string.family_solved),
                     glowColor = Color.Red,
@@ -242,17 +196,64 @@ fun FamilyImageRiddle(onButtonClick: () -> Unit) {
                 ) {
                     Text(text = "Weiter zur nächsten Frage.")
                 }
-            } else if (isCorrect) {
+            } else {
+                // Show current question and answer input
                 Text(
-                    text = "Richtig! Nächste Frage:",
-                    color = Color.Green,
-                    style = MaterialTheme.typography.bodyMedium
+                    text = questions[currentQuestionIndex].first,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(8.dp)
                 )
+
+                // Input box for the user answer
+                TextField(
+                    value = userAnswer,
+                    onValueChange = { userAnswer = it },
+                    label = { Text("Deine Antwort") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Submit button
+                Button(
+                    onClick = {
+                        if (userAnswer.trim()
+                                .equals(questions[currentQuestionIndex].second, ignoreCase = true)
+                        ) {
+                            if (currentQuestionIndex < questions.size - 1) {
+                                currentQuestionIndex++
+                                userAnswer = ""
+                            } else {
+                                // All questions answered
+                                isCorrect = true
+                            }
+                        } else {
+                            // Show dialog if the answer is incorrect
+                            showDialog = true
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Abschicken")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Feedback message for intermediate correct answers
+                if (isCorrect) {
+                    Text(
+                        text = "Richtig! Nächste Frage:",
+                        color = Color.Green,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     }
-    if (showDialog)
-        ShowIncorrectPasswordDialog (onDismiss = {showDialog = false})
+
+    if (showDialog) {
+        ShowIncorrectPasswordDialog(onDismiss = { showDialog = false })
+    }
 }
 
 
